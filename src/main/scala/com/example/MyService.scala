@@ -30,7 +30,7 @@ trait MyService extends HttpService {
           complete {
             <html>
               <body>
-                <h1>Say hello to <i>spray-routing</i> on <i>spray-can</i>!</h1>
+                <h2>Its fun to build apps with Scala, Spray and Typesafe stack! Am loving it! <i>- Bharath</i></h2>
               </body>
             </html>
           }
