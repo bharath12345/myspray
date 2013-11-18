@@ -1,11 +1,12 @@
-package com.example
+package in.bharathwrites
 
 import org.specs2.mutable.Specification
 import spray.testkit.Specs2RouteTest
 import spray.http._
 import StatusCodes._
+import in.bharathwrites.rest.BlogService
 
-class MyServiceSpec extends Specification with Specs2RouteTest with MyService {
+class MyServiceSpec extends Specification with Specs2RouteTest with BlogService {
   def actorRefFactory = system
   
   "MyService" should {
