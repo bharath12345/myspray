@@ -12,7 +12,7 @@ class BlogDAO extends Configuration {
 
   // init Database instance
   private val db = Database.forURL(url = "jdbc:postgresql://%s:%d/%s".format(dbHost, dbPort, dbName),
-    user = dbUser, password = dbPassword, driver = "com.postgresql.jdbc.Driver")
+    user = dbUser, password = dbPassword, driver = "org.postgresql.Driver")
 
   // create tables if not exist
   db.withSession {
