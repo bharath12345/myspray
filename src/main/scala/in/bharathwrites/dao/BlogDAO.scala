@@ -11,8 +11,8 @@ import in.bharathwrites.domain._
 class BlogDAO extends Configuration {
 
   // init Database instance
-  private val db = Database.forURL(url = "jdbc:mysql://%s:%d/%s".format(dbHost, dbPort, dbName),
-    user = dbUser, password = dbPassword, driver = "com.mysql.jdbc.Driver")
+  private val db = Database.forURL(url = "jdbc:postgresql://%s:%d/%s".format(dbHost, dbPort, dbName),
+    user = dbUser, password = dbPassword, driver = "com.postgresql.jdbc.Driver")
 
   // create tables if not exist
   db.withSession {
