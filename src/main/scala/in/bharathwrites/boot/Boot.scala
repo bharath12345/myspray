@@ -16,7 +16,8 @@ object Boot extends App with Configuration with SLF4JLogging {
   // create and start our service actor
   val service = system.actorOf(Props[BlogServiceActor], "blog-service")
 
-  println("Starting on host:" + serviceHost + " port:" + servicePort)
+  println(s"Starting on host: $serviceHost, port: $servicePort")
+  println(s"Using DB host: $dbHost, port: $dbPort, name: $dbName, user: $dbUser, pass: $dbPassword")
 
   // start a new HTTP server with our service actor as the handler
   IO(Http) ! Http.Bind(service, interface = serviceHost, port = servicePort)

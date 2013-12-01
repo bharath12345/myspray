@@ -16,7 +16,7 @@ class BlogDAO extends Configuration {
 
   // create tables if not exist
   db.withSession {
-    if (MTable.getTables("blogs").list().isEmpty) {
+    if (MTable.getTables(blogsTableName).list().isEmpty) {
       Blogs.ddl.create
     }
   }

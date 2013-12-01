@@ -9,7 +9,7 @@ import in.bharathwrites.rest.BlogService
 class MyServiceSpec extends Specification with Specs2RouteTest with BlogService {
   def actorRefFactory = system
   
-  "MyService" should {
+  /*"MyService" should {
 
     "return a greeting for GET requests to the root path" in {
       Get() ~> myRoutes ~> check {
@@ -29,5 +29,5 @@ class MyServiceSpec extends Specification with Specs2RouteTest with BlogService 
         responseAs[String] === "HTTP method not allowed, supported methods: GET"
       }
     }
-  }
+  }*/
 }

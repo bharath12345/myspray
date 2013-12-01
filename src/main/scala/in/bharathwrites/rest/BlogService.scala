@@ -78,20 +78,7 @@ trait BlogService extends HttpService with SLF4JLogging {
 
   val myRoutes = respondWithMediaType(MediaTypes.`application/json`) {
     path("blogs") {
-      post {
-        entity(Unmarshaller(MediaTypes.`application/json`) {
-          case httpEntity: HttpEntity =>
-            read[Blog](httpEntity.asString(HttpCharsets.`UTF-8`))
-        }) {
-          blog: Blog =>
-            ctx: RequestContext =>
-              handleRequest(ctx, StatusCodes.Created) {
-                log.debug("Creating blog: %s".format(blog))
-                blogService.create(blog)
-              }
-        }
-      } ~
-        get {
+      get {
           parameters('title.as[String] ?, 'content.as[String] ?, 'date.as[Date] ?).as(BlogSearchParameters) {
             searchParameters: BlogSearchParameters =>
               {
@@ -106,20 +93,7 @@ trait BlogService extends HttpService with SLF4JLogging {
     } ~
       path("blog" / LongNumber) {
         blogId =>
-          put {
-            entity(Unmarshaller(MediaTypes.`application/json`) {
-              case httpEntity: HttpEntity =>
-                read[Blog](httpEntity.asString(HttpCharsets.`UTF-8`))
-            }) {
-              blog: Blog =>
-                ctx: RequestContext =>
-                  handleRequest(ctx) {
-                    log.debug("Updating blog with id %d: %s".format(blogId, blog))
-                    blogService.update(blogId, blog)
-                  }
-            }
-          } ~
-            delete {
+          delete {
               ctx: RequestContext =>
                 handleRequest(ctx) {
                   log.debug("Deleting blog with id %d".format(blogId))

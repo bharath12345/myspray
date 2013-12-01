@@ -9,24 +9,39 @@ import java.net.URI
  * Holds service configuration settings.
  */
 trait Configuration {
+  
+  /**
+   * Application config object from src/main/resources/application.conf
+   */
+  val config = ConfigFactory.load()
+  
+  /**
+   * Web server settings
+   */
 
-  /** Host name/address to start service on. */
-  lazy val serviceHost = "0.0.0.0"
+  /** Host name/address to start web service on. */
+  lazy val serviceHost = Try(config.getString("service.host")).getOrElse("0.0.0.0")
 
-  /** Port to start service on. */
-  lazy val servicePort = Properties.envOrElse("PORT", "8080").toInt
+  /** Port to start web service on. */
+  lazy val staticHost = Try(config.getString("service.port")).getOrElse("9876")
+  lazy val servicePort = Properties.envOrElse("PORT", staticHost).toInt // <=== This is the Heroku one
 
-  lazy val dbUri = new URI(System.getenv("DATABASE_URL"));
-
-  //lazy val username = dbUri.getUserInfo().split(":")(0);
-  //lazy val password = dbUri.getUserInfo().split(":")(1);
-  //lazy val dbUrl = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath();
-
+  
+  /**
+   * Database settings
+   */
+  var x = System.getenv("DATABASE_URL")
+  if(x == null || x.length() < 1) {
+    x = config.getString("db.local")
+  }
+  //lazy val dbUri = new URI(Try().getOrElse(config.getString("db.local")));
+  lazy val dbUri = new URI(x)
+  
   /** Database host name/address. */
-  lazy val dbHost = Try(dbUri.getHost()).getOrElse("localhost")
+  lazy val dbHost = dbUri.getHost()
 
   /** Database host port number. */
-  lazy val dbPort = Try(dbUri.getPort()).getOrElse(5432)
+  lazy val dbPort = dbUri.getPort()
 
   /** Service database name. */
   lazy val dbName = "dfadohirbu33sv"
@@ -36,10 +51,7 @@ trait Configuration {
 
   /** Password for specified user and database. */
   lazy val dbPassword = dbUri.getUserInfo().split(":")(1)
-
-  /**
-   * Application config object from src/main/resources/application.conf
-   */
-  val config = ConfigFactory.load()
+  
+  lazy val blogsTableName = "blogs"
 
 }
