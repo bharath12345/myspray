@@ -21,4 +21,10 @@ object Boot extends App with Configuration with SLF4JLogging {
 
   // start a new HTTP server with our service actor as the handler
   IO(Http) ! Http.Bind(service, interface = serviceHost, port = servicePort)
+  
+  system.registerOnTermination {
+    // put additional cleanup code here
+    system.log.info("Application shut down")
+    println("application shutting down")
+  }
 }

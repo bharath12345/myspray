@@ -4,7 +4,7 @@ import AssemblyKeys._
 
 seq(SbtStartScript.startScriptForClassesSettings: _*)
 
-name := "Bharathz RESTful Blog"
+name := "BharathzBlog"
 
 version := "1.0"
 
@@ -22,7 +22,7 @@ resolvers ++= Seq(
 
 libraryDependencies ++= {
   val akkaV = "2.2.3"
-  val sprayV = "1.2-RC4"
+  val sprayV = "1.2.0"
   Seq(
     "io.spray"            %   "spray-can"       % sprayV,
     "io.spray"            %   "spray-routing"   % sprayV,

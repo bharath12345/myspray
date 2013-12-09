@@ -6,6 +6,11 @@ import akka.event.slf4j.SLF4JLogging
 import spray.routing._
 import spray.http._
 import spray.httpx.unmarshalling._
+import spray.can.Http
+import spray.http._
+
+import HttpMethods._
+import StatusCodes._
 
 import java.text.{ ParseException, SimpleDateFormat }
 import java.util.Date
@@ -31,6 +36,33 @@ class BlogServiceActor extends Actor with BlogService {
   // or timeout handling
 
   def receive = runRoute(myRoutes)
+
+  /*def receive = {
+    
+    case HttpRequest(GET, Uri.Path("/"), _, _, _) => sender ! index
+    
+    case _: Http.Connected => sender ! Http.Register(self)
+    
+    case _: HttpRequest => runRoute(myRoutes)
+  }
+  
+  lazy val index = HttpResponse(
+      entity = HttpEntity(MediaTypes.`text/html`,
+        <html>
+          <body>
+            <h1>Tiny <i>spray-can</i> benchmark server</h1>
+            <p>Defined resources:</p>
+            <ul>
+              <li><a href="/ping">/ping</a></li>
+              <li><a href="/fast-ping">/fast-ping</a></li>
+              <li><a href="/json">/json</a></li>
+              <li><a href="/fast-json">/fast-json</a></li>
+              <li><a href="/stop">/stop</a></li>
+            </ul>
+          </body>
+        </html>.toString()
+      )
+    )*/
 }
 
 // this trait defines our service behavior independently from the service actor
@@ -76,39 +108,61 @@ trait BlogService extends HttpService with SLF4JLogging {
     }
   }
 
-  val myRoutes = respondWithMediaType(MediaTypes.`application/json`) {
-    path("blogs") {
-      get {
-          parameters('title.as[String] ?, 'content.as[String] ?, 'date.as[Date] ?).as(BlogSearchParameters) {
-            searchParameters: BlogSearchParameters =>
-              {
-                ctx: RequestContext =>
-                  handleRequest(ctx) {
-                    log.debug("Searching for blogs with parameters: %s".format(searchParameters))
-                    blogService.search(searchParameters)
-                  }
-              }
+  val myRoutes =
+    get {
+      pathSingleSlash {
+        complete {
+          <html>
+            <body>
+              <h1>Tiny <i>spray-can</i> benchmark server</h1>
+              <p>Defined resources:</p>
+              <ul>
+                <li><a href="/ping">/ping</a></li>
+                <li><a href="/fast-ping">/fast-ping</a></li>
+                <li><a href="/json">/json</a></li>
+                <li><a href="/fast-json">/fast-json</a></li>
+                <li><a href="/stop">/stop</a></li>
+              </ul>
+            </body>
+          </html>
+        }
+      }
+    } ~
+      path("blogs") {
+        respondWithMediaType(MediaTypes.`application/json`) {
+          get {
+            parameters('title.as[String] ?, 'content.as[String] ?, 'date.as[Date] ?).as(BlogSearchParameters) {
+              searchParameters: BlogSearchParameters =>
+                {
+                  ctx: RequestContext =>
+                    handleRequest(ctx) {
+                      log.debug("Searching for blogs with parameters: %s".format(searchParameters))
+                      blogService.search(searchParameters)
+                    }
+                }
+            }
           }
         }
-    } ~
+      } ~
       path("blog" / LongNumber) {
         blogId =>
-          delete {
+          respondWithMediaType(MediaTypes.`application/json`) {
+            delete {
               ctx: RequestContext =>
                 handleRequest(ctx) {
                   log.debug("Deleting blog with id %d".format(blogId))
                   blogService.delete(blogId)
                 }
             } ~
-            get {
-              ctx: RequestContext =>
-                handleRequest(ctx) {
-                  log.debug("Retrieving blog with id %d".format(blogId))
-                  blogService.get(blogId)
-                }
-            }
+              get {
+                ctx: RequestContext =>
+                  handleRequest(ctx) {
+                    log.debug("Retrieving blog with id %d".format(blogId))
+                    blogService.get(blogId)
+                  }
+              }
+          }
       }
-  }
 
   /**
    * Handles an incoming request and create valid response for it.
