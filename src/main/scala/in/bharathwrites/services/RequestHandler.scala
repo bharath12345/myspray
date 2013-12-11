@@ -16,7 +16,7 @@ import in.bharathwrites.domain.Failure
 import spray.routing.Directive.pimpApply
 
 trait RequestHandler extends HttpService {
-   
+
   implicit val liftJsonFormats = new Formats {
     val dateFormat = new DateFormat {
       val sdf = new SimpleDateFormat("yyyy-MM-dd")
@@ -40,7 +40,7 @@ trait RequestHandler extends HttpService {
       RejectionHandler.Default(rejections)
     }
   }
-  
+
   /**
    * Handles an incoming request and create valid response for it.
    *

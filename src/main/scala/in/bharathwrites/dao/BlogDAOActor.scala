@@ -13,19 +13,19 @@ import akka.actor.Props
 import akka.event.LoggingReceive
 import akka.event.slf4j.SLF4JLogging
 
-object BlogDAO {
+object BlogDAOActor {
   trait DataAccessRequest
   case class Get(id: Long) extends DataAccessRequest
   case class Search(params: BlogSearchParameters) extends DataAccessRequest
 
   trait DataAccessResponse
-  case class GetBlog(blog: Either[Failure, Blog]) extends DataAccessResponse
+  case class ResponseBlog(blog: Either[Failure, Blog]) extends DataAccessResponse
 
-  def props() = Props(classOf[BlogDAO])
+  def props() = Props(classOf[BlogDAOActor])
 }
 
-class BlogDAO extends Actor with Configuration with SLF4JLogging {
-  import BlogDAO._
+class BlogDAOActor extends Actor with Configuration with SLF4JLogging {
+  import BlogDAOActor._
 
   def actorRefFactory = context
 
@@ -34,7 +34,7 @@ class BlogDAO extends Actor with Configuration with SLF4JLogging {
   val normal: Receive = LoggingReceive {
     case Get(id: Long) => {
       log.debug("Retrieving blog with id %d".format(id))
-      sender ! GetBlog(get(id))
+      sender ! ResponseBlog(get(id))
     }
 
     case Search(params: BlogSearchParameters) => {
