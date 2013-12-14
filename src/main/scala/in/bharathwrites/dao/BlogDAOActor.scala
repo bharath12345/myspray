@@ -1,17 +1,18 @@
 package in.bharathwrites.dao
 
-import java.sql._
 import scala.Some
-import scala.slick.driver.PostgresDriver.simple._
-import scala.slick.driver.PostgresDriver.simple.Database.threadLocalSession
-import slick.jdbc.meta.MTable
 import in.bharathwrites.config.Configuration
 import in.bharathwrites.domain._
-import akka.actor.ActorRef
 import akka.actor.Actor
 import akka.actor.Props
 import akka.event.LoggingReceive
 import akka.event.slf4j.SLF4JLogging
+import java.sql.SQLException
+import scala.slick.driver.{JdbcProfile,PostgresDriver}
+import in.bharathwrites.domain.BlogSearchParameters
+import in.bharathwrites.domain.Failure
+import in.bharathwrites.domain.Blog
+import scala.Some
 
 object BlogDAOActor {
   trait DataAccessRequest
@@ -21,11 +22,12 @@ object BlogDAOActor {
   trait DataAccessResponse
   case class ResponseBlog(blog: Either[Failure, Blog]) extends DataAccessResponse
 
-  def props() = Props(classOf[BlogDAOActor])
+  //def props() = Props(classOf[BlogDAOActor])
 }
 
 class BlogDAOActor extends Actor with Configuration with SLF4JLogging {
   import BlogDAOActor._
+  import scala.slick.jdbc.JdbcBackend.{Database, Session}
 
   def actorRefFactory = context
 
@@ -39,24 +41,23 @@ class BlogDAOActor extends Actor with Configuration with SLF4JLogging {
 
     case Search(params: BlogSearchParameters) => {
     }
-    
   }
 
   // init Database instance
-  private val db = Database.forURL(url = "jdbc:postgresql://%s:%d/%s".format(dbHost, dbPort, dbName),
+  val db = Database.forURL(url = "jdbc:postgresql://%s:%d/%s".format(dbHost, dbPort, dbName),
     user = dbUser, password = dbPassword, driver = "org.postgresql.Driver")
 
+  val dao = new BlogDAO(PostgresDriver)
+
   // create tables if not exist
-  db.withSession {
-    if (MTable.getTables(blogsTableName).list().isEmpty) {
-      Blogs.ddl.create
-    }
+  db.withSession { implicit session: Session =>
+    dao.create
   }
 
   def get(id: Long): Either[Failure, Blog] = {
     try {
-      db.withSession {
-        Blogs.findById(id).firstOption match {
+      db.withSession { implicit session: Session =>
+        dao.findById(id) match {
           case Some(blog: Blog) =>
             Right(blog)
           case _ =>
@@ -69,7 +70,7 @@ class BlogDAOActor extends Actor with Configuration with SLF4JLogging {
     }
   }
 
-  def search(params: BlogSearchParameters): Either[Failure, List[Blog]] = {
+  /*def search(params: BlogSearchParameters): Either[Failure, List[Blog]] = {
     implicit val typeMapper = Blogs.dateTypeMapper
 
     try {
@@ -91,7 +92,7 @@ class BlogDAOActor extends Actor with Configuration with SLF4JLogging {
       case e: SQLException =>
         Left(databaseError(e))
     }
-  }
+  }*/
 
   protected def databaseError(e: SQLException) =
     Failure("%d: %s".format(e.getErrorCode, e.getMessage), FailureType.DatabaseFailure)
