@@ -45,8 +45,6 @@ trait BootedCore extends Core {
 trait CoreActors extends Configuration {
   this: Core =>
 
-  //val staticRoutesActor = system.actorOf(Props[StaticRoutesActor], "StaticRoutesActor")
   val blogActor = system.actorOf(Props[BlogActor], "BlogActor")
-  //val staticRoutesActor = system.actorOf(Props[StaticRoutesActor], "StaticRoutesActor")
 
 }

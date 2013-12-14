@@ -1,6 +1,5 @@
 package in.bharathwrites.domain
 
-import scala.slick.driver.PostgresDriver.simple._
 import org.joda.time.DateTime
 import com.github.tototoshi.slick.JodaSupport._
 import scala.slick.driver.{JdbcProfile}
@@ -18,7 +17,7 @@ class BlogDAO(val driver: JdbcProfile) {
 
     def content = column[String]("content")
 
-    def date = column[DateTime]("date", O.Nullable)
+    def date = column[DateTime]("date_time", O.Nullable)
 
     def * = (id, title, content, date) <> (Blog.tupled, Blog.unapply _)
 
