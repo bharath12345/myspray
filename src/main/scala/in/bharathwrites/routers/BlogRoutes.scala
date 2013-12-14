@@ -26,7 +26,7 @@ class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContex
           //request => BlogDaoActor ! Get(blogId)
           //complete { (BlogDaoActor ? Get(blogId)).mapTo[ResponseBlog] }
           complete {
-            (BlogActor ? Get(blogId)).mapTo[ResponseBlog]
+            (BlogActor ? Get(blogId)).mapTo[Blog] // Adding Failure causes Marshalling problems... but you should add it at some point of time
           }
         }
       }

@@ -1,31 +1,13 @@
 package in.bharathwrites.routers
 
-import akka.actor._
-import spray.routing.HttpService
+import spray.routing.{Directives, HttpService}
+import akka.actor.{ActorSystem, ActorRef}
+import akka.event.slf4j.SLF4JLogging
 
-// we don't implement our route structure directly in the service actor because
-// we want to be able to test it independently, without having to spin up an actor
-class StaticRoutesActor extends Actor with StaticRoutes {
+class StaticRoutes(implicit system: ActorSystem) extends Directives with SLF4JLogging {
 
-  // the HttpService trait defines only one abstract member, which
-  // connects the services environment to the enclosing actor or test
-  def actorRefFactory = context
-
-  // this actor only runs our route, but you could add
-  // other things here, like request stream processing,
-  // timeout handling or alternative handler registration
-  def receive = runRoute(demoRoute)
-}
-
-
-// this trait defines our service behavior independently from the service actor
-trait StaticRoutes extends HttpService {
-
-  // we use the enclosing ActorContext's or ActorSystem's dispatcher for our Futures and Scheduler
-  implicit def executionContext = actorRefFactory.dispatcher
-
-  val demoRoute = get {
-    path("/") {
+  val staticRoutes = get {
+    pathSingleSlash {
       complete {
         <html>
           <head>

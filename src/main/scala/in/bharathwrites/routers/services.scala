@@ -3,7 +3,7 @@ package in.bharathwrites.routers
 import spray.http.StatusCodes._
 import spray.http._
 import spray.routing._
-import directives.{CompletionMagnet, RouteDirectives}
+import directives.{RouteDirectives}
 import spray.util.{SprayActorLogging, LoggingContext}
 import util.control.NonFatal
 import spray.httpx.marshalling.Marshaller
@@ -66,7 +66,7 @@ trait FailureHandling {
  *
  * @param route the (concatenated) route
  */
-class RoutedHttpService(route: Route) extends Actor with HttpService with SprayActorLogging {
+class RoutedHttpService(route: Route) extends Actor with HttpService with ActorLogging {
 
   implicit def actorRefFactory = context
 
@@ -90,7 +90,7 @@ class RoutedHttpService(route: Route) extends Actor with HttpService with SprayA
 /**
  * Constructs ``CompletionMagnet``s that set the ``Access-Control-Allow-Origin`` header for modern browsers' AJAX
  * requests on different domains / ports.
- */
+
 trait CrossLocationRouteDirectives extends RouteDirectives {
 
   implicit def fromObjectCross[T : Marshaller](origin: String)(obj: T) =
@@ -105,4 +105,4 @@ trait CrossLocationRouteDirectives extends RouteDirectives {
       ctx.complete(status, headers, obj)
     }
   }
-}
+}*/

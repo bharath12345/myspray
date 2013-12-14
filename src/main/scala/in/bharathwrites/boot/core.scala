@@ -3,7 +3,6 @@ package in.bharathwrites.boot
 import akka.actor.{Props, ActorSystem}
 import in.bharathwrites.config.Configuration
 import in.bharathwrites.actor.BlogActor
-import in.bharathwrites.routers.StaticRoutesActor
 
 /**
  * Core is type containing the ``system: ActorSystem`` member. This enables us to use it in our
@@ -48,6 +47,6 @@ trait CoreActors extends Configuration {
 
   //val staticRoutesActor = system.actorOf(Props[StaticRoutesActor], "StaticRoutesActor")
   val blogActor = system.actorOf(Props[BlogActor], "BlogActor")
-  val staticRoutesActor = system.actorOf(Props[StaticRoutesActor], "StaticRoutesActor")
+  //val staticRoutesActor = system.actorOf(Props[StaticRoutesActor], "StaticRoutesActor")
 
 }
