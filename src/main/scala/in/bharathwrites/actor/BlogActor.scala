@@ -1,4 +1,4 @@
-package in.bharathwrites.dao
+package in.bharathwrites.actor
 
 import scala.Some
 import in.bharathwrites.config.Configuration
@@ -14,7 +14,7 @@ import in.bharathwrites.domain.Failure
 import in.bharathwrites.domain.Blog
 import scala.Some
 
-object BlogDAOActor {
+object BlogActor {
   trait DataAccessRequest
   case class Get(id: Long) extends DataAccessRequest
   case class Search(params: BlogSearchParameters) extends DataAccessRequest
@@ -22,11 +22,11 @@ object BlogDAOActor {
   trait DataAccessResponse
   case class ResponseBlog(blog: Either[Failure, Blog]) extends DataAccessResponse
 
-  //def props() = Props(classOf[BlogDAOActor])
+  def props() = Props(classOf[BlogActor])
 }
 
-class BlogDAOActor extends Actor with Configuration with SLF4JLogging {
-  import BlogDAOActor._
+class BlogActor extends Actor with Configuration with SLF4JLogging {
+  import BlogActor._
   import scala.slick.jdbc.JdbcBackend.{Database, Session}
 
   def actorRefFactory = context

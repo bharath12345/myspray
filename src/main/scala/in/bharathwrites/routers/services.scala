@@ -1,4 +1,4 @@
-package in.bharathwrites.services
+package in.bharathwrites.routers
 
 import spray.http.StatusCodes._
 import spray.http._

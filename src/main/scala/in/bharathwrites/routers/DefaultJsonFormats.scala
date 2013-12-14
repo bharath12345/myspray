@@ -1,4 +1,4 @@
-package in.bharathwrites.services
+package in.bharathwrites.routers
 
 import spray.json._
 import java.util.UUID
@@ -6,6 +6,7 @@ import scala.reflect.ClassTag
 import spray.httpx.marshalling.{MetaMarshallers, Marshaller, CollectingMarshallingContext}
 import spray.http.StatusCode
 import spray.httpx.SprayJsonSupport
+import org.joda.time.DateTime
 
 /**
  * Contains useful JSON formats: ``j.u.Date``, ``j.u.UUID`` and others; it is useful
@@ -17,9 +18,11 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
   /**
    * Computes ``RootJsonFormat`` for type ``A`` if ``A`` is object
    */
-  def jsonObjectFormat[A : ClassTag]: RootJsonFormat[A] = new RootJsonFormat[A] {
+  def jsonObjectFormat[A: ClassTag]: RootJsonFormat[A] = new RootJsonFormat[A] {
     val ct = implicitly[ClassTag[A]]
+
     def write(obj: A): JsValue = JsObject("value" -> JsString(ct.runtimeClass.getSimpleName))
+
     def read(json: JsValue): A = ct.runtimeClass.newInstance().asInstanceOf[A]
   }
 
@@ -28,10 +31,20 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
    */
   implicit object UuidJsonFormat extends RootJsonFormat[UUID] {
     def write(x: UUID) = JsString(x.toString)
+
     def read(value: JsValue) = value match {
       case JsString(x) => UUID.fromString(x)
-      case x           => deserializationError("Expected UUID as JsString, but got " + x)
+      case x => deserializationError("Expected UUID as JsString, but got " + x)
     }
+  }
+
+  implicit val DateFormat = new RootJsonFormat[DateTime] {
+    //lazy val format = new java.text.SimpleDateFormat()
+
+    def write(date: DateTime) = JsString(date.toString())
+
+    def read(json: JsValue): DateTime = new DateTime(json.compactPrint)
+
   }
 
   /**
@@ -53,15 +66,16 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
    * @return marshaller
    */
   implicit def errorSelectingEitherMarshaller[A, B](implicit ma: Marshaller[A], mb: Marshaller[B], esa: ErrorSelector[A]): Marshaller[Either[A, B]] =
-    Marshaller[Either[A, B]] { (value, ctx) =>
-      value match {
-        case Left(a) =>
-          val mc = new CollectingMarshallingContext()
-          ma(a, mc)
-          ctx.handleError(ErrorResponseException(esa(a), mc.entity))
-        case Right(b) =>
-          mb(b, ctx)
-      }
+    Marshaller[Either[A, B]] {
+      (value, ctx) =>
+        value match {
+          case Left(a) =>
+            val mc = new CollectingMarshallingContext()
+            ma(a, mc)
+            ctx.handleError(ErrorResponseException(esa(a), mc.entity))
+          case Right(b) =>
+            mb(b, ctx)
+        }
     }
 
 }

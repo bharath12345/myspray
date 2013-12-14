@@ -2,7 +2,8 @@ package in.bharathwrites.boot
 
 import akka.actor.{Props, ActorSystem}
 import in.bharathwrites.config.Configuration
-import in.bharathwrites.dao.BlogDAOActor
+import in.bharathwrites.actor.BlogActor
+import in.bharathwrites.routers.StaticRoutesActor
 
 /**
  * Core is type containing the ``system: ActorSystem`` member. This enables us to use it in our
@@ -45,5 +46,8 @@ trait BootedCore extends Core {
 trait CoreActors extends Configuration {
   this: Core =>
 
-  val blogDAOActor = system.actorOf(Props[BlogDAOActor], "BlogDAOActor")
+  //val staticRoutesActor = system.actorOf(Props[StaticRoutesActor], "StaticRoutesActor")
+  val blogActor = system.actorOf(Props[BlogActor], "BlogActor")
+  val staticRoutesActor = system.actorOf(Props[StaticRoutesActor], "StaticRoutesActor")
+
 }

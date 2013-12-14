@@ -4,9 +4,9 @@ import org.specs2.mutable.Specification
 import spray.testkit.Specs2RouteTest
 import spray.http._
 import StatusCodes._
-import in.bharathwrites.services.BlogService
+import in.bharathwrites.routers.BlogRoutes
 
-class MyServiceSpec extends Specification with Specs2RouteTest with BlogService {
+class MyServiceSpec extends Specification with Specs2RouteTest with BlogRoutes {
   def actorRefFactory = system
   
   /*"MyService" should {

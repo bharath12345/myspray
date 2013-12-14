@@ -2,10 +2,10 @@ package in.bharathwrites.boot
 
 import akka.actor.Props
 import spray.routing.RouteConcatenation
-import in.bharathwrites.services.{BlogService, RoutedHttpService}
+import in.bharathwrites.routers.{BlogRoutes, RoutedHttpService}
 
 /**
- * The REST API layer. It exposes the REST services, but does not provide any
+ * The REST API layer. It exposes the REST routers, but does not provide any
  * web server interface.<br/>
  * Notice that it requires to be mixed in with ``core.CoreActors``, which provides access
  * to the top-level actors that make up the system.
@@ -16,7 +16,7 @@ trait Api extends RouteConcatenation {
   private implicit val _ = system.dispatcher
 
   // append all routes using ~
-  val routes = new BlogService(blogDAOActor).route
+  val routes = new BlogRoutes(blogActor).route
 
   val rootService = system.actorOf(Props(new RoutedHttpService(routes)))
 
