@@ -81,6 +81,19 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
     }
   }
 
+  /*def create(blog: Blog): Either[Failure, Blog] = {
+    try {
+      val id = db.withSession { implicit session: Session =>
+        Blogs returning Blogs.id insert blog
+      }
+      Right(blog.copy(id = Some(id)))
+    } catch {
+      case e: SQLException =>
+        Left(databaseError(e))
+    }
+  }*/
+
+
   /*def search(params: BlogSearchParameters): Either[Failure, List[Blog]] = {
     implicit val typeMapper = Blogs.dateTypeMapper
 
@@ -111,19 +124,8 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
   protected def notFoundError(blogId: Long) =
     Failure("Blog with id=%d does not exist".format(blogId), FailureType.NotFound)
 
-  /*def create(blog: Blog): Either[Failure, Blog] = {
-    try {
-      val id = db.withSession {
-        Blogs returning Blogs.id insert blog
-      }
-      Right(blog.copy(id = Some(id)))
-    } catch {
-      case e: SQLException =>
-        Left(databaseError(e))
-    }
-  }
 
-  def update(id: Long, blog: Blog): Either[Failure, Blog] = {
+  /*def update(id: Long, blog: Blog): Either[Failure, Blog] = {
     try
       db.withSession {
         Blogs.where(_.id === id) update blog.copy(id = Some(id)) match {

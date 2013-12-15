@@ -24,8 +24,6 @@ class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContex
     blogId =>
       respondWithMediaType(MediaTypes.`application/json`) {
         get {
-          //request => BlogDaoActor ! Get(blogId)
-          //complete { (BlogDaoActor ? Get(blogId)).mapTo[ResponseBlog] }
           complete {
             (BlogActor ? Get(blogId)).mapTo[Blog]
           }
