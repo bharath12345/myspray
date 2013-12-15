@@ -11,11 +11,12 @@ import scala.concurrent.ExecutionContext
 import akka.pattern.ask
 import spray.httpx.unmarshalling.{MalformedContent, FromStringDeserializer}
 import in.bharathwrites.actor.BlogActor.{ResponseBlog, Get}
+import scala.reflect._
 
 class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContext, system: ActorSystem)
   extends Directives with DefaultJsonFormats with SLF4JLogging {
 
-  implicit val timeout = Timeout(10.seconds)
+  implicit val timeout = Timeout(5.seconds)
 
   implicit val blogFormat = jsonFormat4(Blog)
 
@@ -26,7 +27,7 @@ class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContex
           //request => BlogDaoActor ! Get(blogId)
           //complete { (BlogDaoActor ? Get(blogId)).mapTo[ResponseBlog] }
           complete {
-            (BlogActor ? Get(blogId)).mapTo[Blog] // Adding Failure causes Marshalling problems... but you should add it at some point of time
+            (BlogActor ? Get(blogId)).mapTo[Blog]
           }
         }
       }

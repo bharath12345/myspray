@@ -21,7 +21,7 @@ object BlogActor {
   case class Search(params: BlogSearchParameters) extends DataAccessRequest
 
   trait DataAccessResponse
-  case class ResponseBlog(blog: Either[Failure, Blog]) extends DataAccessResponse
+  case class ResponseBlog(blog: Blog) extends DataAccessResponse
 
   def props() = Props(classOf[BlogActor])
 }
@@ -37,7 +37,11 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
   val normal: Receive = LoggingReceive {
     case Get(id: Long) => {
       log.debug("Retrieving blog with id %d".format(id))
-      sender ! ResponseBlog(get(id))
+      //sender ! ResponseBlog(get(id))
+      get(id) match {
+        case Right(blog) => sender ! blog
+        case Left(_) =>
+      }
     }
 
     case Search(params: BlogSearchParameters) => {

@@ -7,7 +7,8 @@ import spray.httpx.marshalling.{MetaMarshallers, Marshaller, CollectingMarshalli
 import spray.http.StatusCode
 import spray.httpx.SprayJsonSupport
 import org.joda.time.DateTime
-
+import in.bharathwrites.domain.FailureType.Failure
+import in.bharathwrites.domain.FailureType
 /**
  * Contains useful JSON formats: ``j.u.Date``, ``j.u.UUID`` and others; it is useful
  * when creating traits that contain the ``JsonReader`` and ``JsonWriter`` instances
@@ -24,6 +25,7 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
     def write(obj: A): JsValue = JsObject("value" -> JsString(ct.runtimeClass.getSimpleName))
 
     def read(json: JsValue): A = ct.runtimeClass.newInstance().asInstanceOf[A]
+
   }
 
   /**
@@ -40,11 +42,13 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
 
   implicit val DateFormat = new RootJsonFormat[DateTime] {
     //lazy val format = new java.text.SimpleDateFormat()
-
     def write(date: DateTime) = JsString(date.toString())
+    def read(json: JsValue): DateTime = new DateTime(0)
+  }
 
-    def read(json: JsValue): DateTime = new DateTime(json.compactPrint)
-
+  implicit object FailureFormat extends RootJsonFormat[Failure] {
+    def write(failure: Failure) = JsString(failure.toString)
+    def read(json: JsValue): Failure = FailureType.InternalError
   }
 
   /**
