@@ -15,7 +15,7 @@ import in.bharathwrites.actor.BlogActor.{ResponseBlog, Get}
 class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContext, system: ActorSystem)
   extends Directives with DefaultJsonFormats with SLF4JLogging {
 
-  implicit val timeout = Timeout(2.seconds)
+  implicit val timeout = Timeout(10.seconds)
 
   implicit val blogFormat = jsonFormat4(Blog)
 

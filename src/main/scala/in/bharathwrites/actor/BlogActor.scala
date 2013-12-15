@@ -13,6 +13,7 @@ import in.bharathwrites.domain.BlogSearchParameters
 import in.bharathwrites.domain.Failure
 import in.bharathwrites.domain.Blog
 import scala.Some
+import scala.slick.jdbc.meta.MTable
 
 object BlogActor {
   trait DataAccessRequest
@@ -51,17 +52,23 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
 
   // create tables if not exist
   db.withSession { implicit session: Session =>
-    dao.create
+    if (!MTable.getTables.list.exists(_.name.name == "BLOGS"))
+      dao.create
   }
 
   def get(id: Long): Either[Failure, Blog] = {
     try {
       db.withSession { implicit session: Session =>
+        log.debug("finding for id = " + id)
         dao.findById(id) match {
-          case Some(blog: Blog) =>
+          case Some(blog: Blog) => {
+            log.debug("found blog! = " + blog)
             Right(blog)
-          case _ =>
+          }
+          case _ => {
+            log.debug("did not find blog!")
             Left(notFoundError(id))
+          }
         }
       }
     } catch {
