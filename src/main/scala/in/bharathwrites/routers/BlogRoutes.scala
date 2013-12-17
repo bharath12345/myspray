@@ -10,8 +10,7 @@ import in.bharathwrites.domain._
 import scala.concurrent.ExecutionContext
 import akka.pattern.ask
 import spray.httpx.unmarshalling.{MalformedContent, FromStringDeserializer}
-import in.bharathwrites.actor.BlogActor.{ResponseBlog, Get}
-import scala.reflect._
+import in.bharathwrites.actor.BlogActor.{GetAll, Get}
 
 class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContext, system: ActorSystem)
   extends Directives with DefaultJsonFormats with SLF4JLogging {
@@ -29,5 +28,13 @@ class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContex
           }
         }
       }
+  } ~ path("blogs") {
+    respondWithMediaType(MediaTypes.`application/json`) {
+      get {
+        complete {
+          (BlogActor ? GetAll).mapTo[List[Blog]]
+        }
+      }
+    }
   }
 }

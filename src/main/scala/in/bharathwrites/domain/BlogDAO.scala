@@ -33,5 +33,6 @@ class BlogDAO(val driver: JdbcProfile) {
     if p.id === id
   } yield p).firstOption
 
+  def findAll(implicit session: Session): List[Blog] = (for{p <- props} yield p).list
 
 }

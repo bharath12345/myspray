@@ -18,10 +18,8 @@ import scala.slick.jdbc.meta.MTable
 object BlogActor {
   trait DataAccessRequest
   case class Get(id: Long) extends DataAccessRequest
+  case class GetAll() extends DataAccessRequest
   case class Search(params: BlogSearchParameters) extends DataAccessRequest
-
-  trait DataAccessResponse
-  case class ResponseBlog(blog: Blog) extends DataAccessResponse
 
   def props() = Props(classOf[BlogActor])
 }
@@ -32,16 +30,18 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
 
   def actorRefFactory = context
 
-  def receive = normal
-
-  val normal: Receive = LoggingReceive {
+  def receive: Receive = LoggingReceive {
     case Get(id: Long) => {
       log.debug("Retrieving blog with id %d".format(id))
-      //sender ! ResponseBlog(get(id))
       get(id) match {
         case Right(blog) => sender ! blog
         case Left(_) =>
       }
+    }
+
+    case GetAll => {
+      log.debug("Getting all blogs")
+      sender ! getAll
     }
 
     case Search(params: BlogSearchParameters) => {
@@ -78,6 +78,15 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
     } catch {
       case e: SQLException =>
         Left(databaseError(e))
+    }
+  }
+
+  def getAll: List[Blog] = {
+    try {
+      db.withSession{ implicit session: Session =>
+        log.debug("getting all blogs")
+        dao.findAll
+      }
     }
   }
 
