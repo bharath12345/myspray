@@ -17,14 +17,18 @@ import scala.slick.jdbc.meta.MTable
 
 object BlogActor {
   trait DataAccessRequest
-  case class Get(id: Long) extends DataAccessRequest
-  case class GetAll() extends DataAccessRequest
+  case class Get(id: Long)                extends DataAccessRequest
+  case class GetAll()                     extends DataAccessRequest
+  case class Create(blog: Blog)           extends DataAccessRequest
+  case class Update(id: Long, blog: Blog) extends DataAccessRequest
+  case class Delete(id: Long)             extends DataAccessRequest
+
   case class Search(params: BlogSearchParameters) extends DataAccessRequest
 
   def props() = Props(classOf[BlogActor])
 }
 
-class BlogActor extends Actor with Configuration with SLF4JLogging {
+class BlogActor extends Actor with Configuration with SLF4JLogging with AbstractActor {
   import BlogActor._
   import scala.slick.jdbc.JdbcBackend.{Database, Session}
 
@@ -39,12 +43,20 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
       }
     }
 
-    case GetAll => {
-      log.debug("Getting all blogs")
-      sender ! getAll
-    }
+    case GetAll => sender ! getAll
 
-    case Search(params: BlogSearchParameters) => {
+    case Search(params: BlogSearchParameters) => {}
+
+    case Create(blog: Blog) => sender ! create(blog)
+
+    case Update(id: Long, blog: Blog) => sender ! update(id, blog)
+
+    case Delete(id: Long) => {
+      log.debug("Deleting blog with id %d".format(id))
+      get(id) match {
+        case Right(blog) => sender ! blog
+        case Left(_) =>
+      }
     }
   }
 
@@ -59,6 +71,8 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
     if (!MTable.getTables.list.exists(_.name.name == "BLOGS"))
       dao.create
   }
+
+  // ToDo: Wrap each CRUD operation in a Transaction
 
   def get(id: Long): Either[Failure, Blog] = {
     try {
@@ -82,25 +96,30 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
   }
 
   def getAll: List[Blog] = {
-    try {
       db.withSession{ implicit session: Session =>
         log.debug("getting all blogs")
         dao.findAll
-      }
     }
   }
 
-  /*def create(blog: Blog): Either[Failure, Blog] = {
-    try {
-      val id = db.withSession { implicit session: Session =>
-        Blogs returning Blogs.id insert blog
+  def create(blog: Blog): Blog = {
+      db.withSession { implicit session: Session =>
+        log.debug("creating blog = " + blog.toString)
+        dao.insert(blog)
       }
-      Right(blog.copy(id = Some(id)))
-    } catch {
-      case e: SQLException =>
-        Left(databaseError(e))
+  }
+
+  def update(id: Long, blog: Blog): Blog = {
+      db.withSession { implicit session: Session =>
+        dao.update(id, blog)
+      }
+  }
+
+  def delete(id: Long): Option[Blog] = {
+    db.withSession { implicit session: Session =>
+      dao.delete(id)
     }
-  }*/
+  }
 
 
   /*def search(params: BlogSearchParameters): Either[Failure, List[Blog]] = {
@@ -120,47 +139,6 @@ class BlogActor extends Actor with Configuration with SLF4JLogging {
         } yield blog
 
         Right(query.run.toList)
-      }
-    } catch {
-      case e: SQLException =>
-        Left(databaseError(e))
-    }
-  }*/
-
-  protected def databaseError(e: SQLException) =
-    Failure("%d: %s".format(e.getErrorCode, e.getMessage), FailureType.DatabaseFailure)
-
-  protected def notFoundError(blogId: Long) =
-    Failure("Blog with id=%d does not exist".format(blogId), FailureType.NotFound)
-
-
-  /*def update(id: Long, blog: Blog): Either[Failure, Blog] = {
-    try
-      db.withSession {
-        Blogs.where(_.id === id) update blog.copy(id = Some(id)) match {
-          case 0 => Left(notFoundError(id))
-          case _ => Right(blog.copy(id = Some(id)))
-        }
-      }
-    catch {
-      case e: SQLException =>
-        Left(databaseError(e))
-    }
-  }
-
-  def delete(id: Long): Either[Failure, Blog] = {
-    try {
-      db.withTransaction {
-        val query = Blogs.where(_.id === id)
-        val blogs = query.run.asInstanceOf[List[Blog]]
-        blogs.size match {
-          case 0 =>
-            Left(notFoundError(id))
-          case _ => {
-            query.delete
-            Right(blogs.head)
-          }
-        }
       }
     } catch {
       case e: SQLException =>

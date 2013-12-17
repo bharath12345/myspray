@@ -8,7 +8,9 @@ import spray.http.StatusCode
 import spray.httpx.SprayJsonSupport
 import org.joda.time.DateTime
 import in.bharathwrites.domain.FailureType.Failure
-import in.bharathwrites.domain.FailureType
+import in.bharathwrites.domain.{Blog, FailureType}
+import in.bharathwrites.domain.Blog
+
 /**
  * Contains useful JSON formats: ``j.u.Date``, ``j.u.UUID`` and others; it is useful
  * when creating traits that contain the ``JsonReader`` and ``JsonWriter`` instances
@@ -25,7 +27,6 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
     def write(obj: A): JsValue = JsObject("value" -> JsString(ct.runtimeClass.getSimpleName))
 
     def read(json: JsValue): A = ct.runtimeClass.newInstance().asInstanceOf[A]
-
   }
 
   /**
@@ -43,12 +44,36 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
   implicit val DateFormat = new RootJsonFormat[DateTime] {
     //lazy val format = new java.text.SimpleDateFormat()
     def write(date: DateTime) = JsString(date.toString())
+
     def read(json: JsValue): DateTime = new DateTime(0)
   }
 
   implicit object FailureFormat extends RootJsonFormat[Failure] {
     def write(failure: Failure) = JsString(failure.toString)
+
     def read(json: JsValue): Failure = FailureType.InternalError
+  }
+
+  implicit object BlogFormat extends RootJsonFormat[Blog] {
+    def write(b: Blog) =
+    //JsArray(JsString(b.title), JsString(b.content), JsNumber(b.id), JsString(b.dateTime.toString()))
+      JsObject(
+        "title" -> JsString(b.title),
+        "content" -> JsString(b.content),
+        "id" -> JsNumber(b.id),
+        "date" -> JsString(b.dateTime.toString())
+      )
+
+    def read(json: JsValue) = {
+      json.asJsObject.getFields("title", "content") match {
+        case Seq(JsString(title), JsString(content)) => {
+          new Blog(0, title, content, new DateTime())
+        }
+        case _ => {
+          throw new DeserializationException("Problem encountered in Blog demarshaling")
+        }
+      }
+    }
   }
 
   /**

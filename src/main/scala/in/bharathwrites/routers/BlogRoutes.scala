@@ -10,31 +10,35 @@ import in.bharathwrites.domain._
 import scala.concurrent.ExecutionContext
 import akka.pattern.ask
 import spray.httpx.unmarshalling.{MalformedContent, FromStringDeserializer}
-import in.bharathwrites.actor.BlogActor.{GetAll, Get}
+import in.bharathwrites.actor.BlogActor.{GetAll, Get, Create}
+import spray.httpx.unmarshalling._
 
 class BlogRoutes(BlogActor: ActorRef)(implicit executionContext: ExecutionContext, system: ActorSystem)
   extends Directives with DefaultJsonFormats with SLF4JLogging {
 
   implicit val timeout = Timeout(5.seconds)
 
-  implicit val blogFormat = jsonFormat4(Blog)
-
-  val route = path("blog" / LongNumber) {
-    blogId =>
-      respondWithMediaType(MediaTypes.`application/json`) {
-        get {
-          complete {
-            (BlogActor ? Get(blogId)).mapTo[Blog]
-          }
-        }
-      }
-  } ~ path("blogs") {
+  val route =
     respondWithMediaType(MediaTypes.`application/json`) {
       get {
-        complete {
-          (BlogActor ? GetAll).mapTo[List[Blog]]
+        path("blog" / LongNumber) {
+          blogId =>
+            complete {
+              (BlogActor ? Get(blogId)).mapTo[Blog]
+            }
+        } ~ path("blogs") {
+          complete {
+            (BlogActor ? GetAll).mapTo[List[Blog]]
+          }
+        }
+      } ~ post {
+        path("blog")
+        entity(as[Blog]) {
+          blog: Blog =>
+            complete {
+              (BlogActor ? Create(blog)).mapTo[Blog]
+            }
         }
       }
     }
-  }
 }
