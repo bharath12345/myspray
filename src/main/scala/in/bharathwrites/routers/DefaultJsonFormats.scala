@@ -56,7 +56,6 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
 
   implicit object BlogFormat extends RootJsonFormat[Blog] {
     def write(b: Blog) =
-    //JsArray(JsString(b.title), JsString(b.content), JsNumber(b.id), JsString(b.dateTime.toString()))
       JsObject(
         "title" -> JsString(b.title),
         "content" -> JsString(b.content),

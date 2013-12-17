@@ -37,6 +37,8 @@ class BlogDAO(val driver: JdbcProfile) {
   def insert(blog: Blog)(implicit session: Session): Blog = blogsAutoInc.insert(blog)
 
   def update(id: Long, blog: Blog)(implicit session: Session): Blog = {
+    //val abc = blogs.where(_.id === id)
+
     blogs.where(_.id === id).update(blog)
     return blog
   }
