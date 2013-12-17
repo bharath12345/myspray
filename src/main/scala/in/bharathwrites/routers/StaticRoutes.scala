@@ -11,7 +11,17 @@ class StaticRoutes(implicit system: ActorSystem) extends Directives with SLF4JLo
       complete {
         <html>
           <head>
-            <script type="text/javascript" src="css/test.css"></script>
+            <link rel="stylesheet" type="text/css" href="/lib/my/common.min.css"></link>
+            <link rel='stylesheet' type='text/css' href="/lib/bootstrap/css/bootstrap.min.css"></link>
+            <link rel="stylesheet" type='text/css' href="/lib/bootstrap/css/docs.css"></link>
+            <link rel='stylesheet' type='text/css' href="/lib/fontawesome/css/font-awesome.min.css"></link>
+            <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/dojo/1.9.1/dijit/themes/claro/claro.css" media="screen"></link>
+
+            <script type="text/javascript" src="/lib/bootstrap/js/bootstrap.min.js"></script>
+            <script type="text/javascript" src="/lib/jQuery/jquery-1.10.2.min.js"></script>
+            <script type="text/javascript" src="/lib/jquery.toc/js/jquery.tableofcontents.min.js"></script>
+            <script type="text/javascript" src="/lib/d3/d3-3.3.2.min.js"></script>
+            <script type="text/javascript" src="/lib/jsPlumb/jquery.jsPlumb-1.5.2-min.js"></script>
           </head>
           <body>
             <h1>Jai Shri Ram</h1>
@@ -19,14 +29,14 @@ class StaticRoutes(implicit system: ActorSystem) extends Directives with SLF4JLo
         </html>
       }
     } ~
-      pathPrefix("css") {
+      pathPrefix("lib") {
         get {
-          getFromResourceDirectory("css")
+          getFromResourceDirectory("lib")
         }
       } ~
-      pathPrefix("js") {
+      pathPrefix("images") {
         get {
-          getFromResourceDirectory("js")
+          getFromResourceDirectory("images")
         }
       }
   }
