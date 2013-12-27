@@ -2,7 +2,7 @@ import com.typesafe.sbt.SbtStartScript
 
 seq(SbtStartScript.startScriptForClassesSettings: _*)
 
-name := "BharathzBlog"
+name := "scalog"
 
 version := "1.0"
 
@@ -41,7 +41,8 @@ libraryDependencies ++= {
     "joda-time"              %   "joda-time"          % "2.3",
     "com.github.tototoshi"   %%  "slick-joda-mapper"  % "1.0.0-SNAPSHOT",
     "org.pegdown"            %   "pegdown"            % "1.4.2",
-    "org.parboiled"          %   "parboiled-java"     % "1.1.6"
+    "org.parboiled"          %   "parboiled-java"     % "1.1.6",
+    "org.fusesource.scalate" %   "scalate-core_2.10"  % "1.6.1"
   )
 }
 
