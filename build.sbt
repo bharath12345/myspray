@@ -39,7 +39,9 @@ libraryDependencies ++= {
     "ch.qos.logback"         %   "logback-classic"    % "1.0.13",
     "net.liftweb"            %%  "lift-json"          % "2.5.1",
     "joda-time"              %   "joda-time"          % "2.3",
-    "com.github.tototoshi"   %%  "slick-joda-mapper"  % "1.0.0-SNAPSHOT"
+    "com.github.tototoshi"   %%  "slick-joda-mapper"  % "1.0.0-SNAPSHOT",
+    "org.pegdown"            %   "pegdown"            % "1.4.2",
+    "org.parboiled"          %   "parboiled-java"     % "1.1.6"
   )
 }
 

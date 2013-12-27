@@ -24,7 +24,7 @@ class StaticRoutes(implicit system: ActorSystem) extends Directives with SLF4JLo
             <script type="text/javascript" src="/lib/jsPlumb/jquery.jsPlumb-1.5.2-min.js"></script>
           </head>
           <body>
-            <h1>Jai Shri Ram</h1>
+            <h1>Welcome 2014!</h1>
           </body>
         </html>
       }

@@ -10,6 +10,7 @@ import org.joda.time.DateTime
 import in.bharathwrites.domain.FailureType.Failure
 import in.bharathwrites.domain.{Blog, FailureType}
 import in.bharathwrites.domain.Blog
+import org.pegdown.PegDownProcessor
 
 /**
  * Contains useful JSON formats: ``j.u.Date``, ``j.u.UUID`` and others; it is useful
@@ -17,6 +18,8 @@ import in.bharathwrites.domain.Blog
  * for types that contain ``Date``s, ``UUID``s and such like.
  */
 trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with MetaMarshallers {
+
+  val pegdown = new PegDownProcessor
 
   /**
    * Computes ``RootJsonFormat`` for type ``A`` if ``A`` is object
@@ -58,7 +61,7 @@ trait DefaultJsonFormats extends DefaultJsonProtocol with SprayJsonSupport with 
     def write(b: Blog) =
       JsObject(
         "title" -> JsString(b.title),
-        "content" -> JsString(b.content),
+        "content" -> JsString(pegdown.markdownToHtml(b.content)),
         "id" -> JsNumber(b.id),
         "date" -> JsString(b.dateTime.toString())
       )
