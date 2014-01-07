@@ -4,7 +4,12 @@ import org.joda.time.DateTime
 import com.github.tototoshi.slick.JodaSupport._
 import scala.slick.driver.{JdbcProfile}
 
-case class Blog(id: Long, title: String, content: String, dateTime: DateTime)
+case class Blog(id: Long,
+                title: String, subtitle: String,
+                content: String,
+                dateTime: DateTime,
+                category: Category,
+                tags: Array[BlogTag])
 
 class BlogDAO(val driver: JdbcProfile) {
   import driver.simple._
@@ -14,6 +19,8 @@ class BlogDAO(val driver: JdbcProfile) {
     def id = column[Long]("id", O.PrimaryKey, O.AutoInc)
 
     def title = column[String]("title")
+
+    def subtitle = column[String]("subtitle")
 
     def content = column[String]("content")
 
